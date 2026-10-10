@@ -5,7 +5,14 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas import LeadCreate, LeadResponse, LeadUpdate, EvaluateLeadRequest, EvaluateLeadResponse
+from app.schemas import (
+    EvaluateLeadRequest,
+    EvaluateLeadResponse,
+    LeadAnalysisResponse,
+    LeadCreate,
+    LeadResponse,
+    LeadUpdate,
+)
 from app.services import lead_service, analysis_service, qualification
 
 router = APIRouter(prefix="/api/leads", tags=["leads"])
@@ -82,3 +89,15 @@ def evaluate_lead(
         status=result.status,
         reasons=result.reasons,
     )
+
+
+@router.get("/{lead_id}/analysis", response_model=LeadAnalysisResponse)
+def get_lead_analysis(lead_id: UUID, db: Session = Depends(get_db)):
+    lead = lead_service.get_lead(db, lead_id)
+    if lead is None:
+        raise HTTPException(status_code=404, detail="Lead not found")
+
+    analysis = analysis_service.get_analysis(db, lead_id)
+    if analysis is None:
+        raise HTTPException(status_code=404, detail="Analysis not found")
+    return analysis

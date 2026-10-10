@@ -29,3 +29,31 @@ export function StatusBadge({ variant, children, className }: StatusBadgeProps) 
     </span>
   );
 }
+
+export function statusVariant(status: string) {
+  switch (status) {
+    case "qualified":
+      return "success" as const;
+    case "rejected":
+      return "danger" as const;
+    case "needs_review":
+      return "warning" as const;
+    case "pending":
+      return "muted" as const;
+    default:
+      return "muted" as const;
+  }
+}
+
+export function priorityVariant(priority: string | null) {
+  switch (priority) {
+    case "high":
+      return "danger" as const;
+    case "medium":
+      return "warning" as const;
+    case "low":
+      return "info" as const;
+    default:
+      return "muted" as const;
+  }
+}

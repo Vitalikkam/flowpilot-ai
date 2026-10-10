@@ -9,11 +9,11 @@ import {
 import { MetricCard } from "@/components/MetricCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useExecutions } from "@/hooks/useExecutions";
-import { useLeads } from "@/hooks/useLeads";
+import { useLead } from "@/hooks/useLead";
 import { formatDuration, formatPercent, formatRelative } from "@/utils/format";
 
 export function Overview() {
-  const leads = useLeads({ limit: 200 });
+  const leads = useLead({ limit: 200 });
   const executions = useExecutions({ limit: 50 });
 
   const allLeads = leads.data ?? [];

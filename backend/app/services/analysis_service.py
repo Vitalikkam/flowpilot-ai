@@ -38,3 +38,10 @@ def upsert_analysis(
     db.commit()
     db.refresh(existing)
     return existing
+
+
+def get_analysis(db: Session, lead_id: UUID) -> Optional[LeadAnalysis]:
+    """Return the analysis for a lead, or None."""
+    return db.execute(
+        select(LeadAnalysis).where(LeadAnalysis.lead_id == lead_id)
+    ).scalar_one_or_none()

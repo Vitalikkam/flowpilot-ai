@@ -1,6 +1,7 @@
 import type {
   ExecutionListParams,
   Lead,
+  LeadAnalysis,
   LeadListParams,
   WorkflowExecution,
 } from "@/types/api";
@@ -67,6 +68,10 @@ export const api = {
 
   getLead(id: string): Promise<Lead> {
     return request<Lead>(`/api/leads/${id}`);
+  },
+
+  getLeadAnalysis(id: string): Promise<LeadAnalysis> {
+    return request<LeadAnalysis>(`/api/leads/${id}/analysis`);
   },
 
   updateLead(
