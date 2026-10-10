@@ -93,8 +93,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1232,
-        -144
+        1616,
+        -160
       ],
       "id": "10adf4c5-a0f0-44f5-835a-44940e0d4421",
       "name": "Respond OK"
@@ -160,6 +160,90 @@
       ],
       "id": "9c5ba7e0-779d-4c08-b583-890cc47dd4a0",
       "name": "Parse AI Output"
+    },
+    {
+      "parameters": {
+        "jsCode": "// $json comes from Parse AI Output: { lead, ai, model }\nconst { lead, ai, model } = $json;\nconst errors = [];\n\n\n// ── summary ─────────────────────────────────────────────\nif (typeof ai.summary !== 'string') {\n  errors.push('summary is not a string');\n} else if (ai.summary.trim().length === 0) {\n  errors.push('summary is empty');\n} else if (ai.summary.length > 2000) {\n  errors.push('summary exceeds 2000 characters');\n}\n\n// ── category ────────────────────────────────────────────\nconst validCategories = ['web_development', 'automation', 'consulting', 'other'];\nif (!validCategories.includes(ai.category)) {\n  errors.push(`category must be one of: ${validCategories.join(', ')}`);\n}\n\n// ── urgency ─────────────────────────────────────────────\nconst validUrgencies = ['low', 'medium', 'high'];\nif (!validUrgencies.includes(ai.urgency)) {\n  errors.push(`urgency must be one of: ${validUrgencies.join(', ')}`);\n}\n\n// ── budget_usd ──────────────────────────────────────────\nif (ai.budget_usd !== null && ai.budget_usd !== undefined) {\n  if (\n    typeof ai.budget_usd !== 'number' ||\n    !isFinite(ai.budget_usd) ||\n    ai.budget_usd < 0\n  ) {\n    errors.push('budget_usd must be null or a non-negative number');\n  }\n}\n\nconst valid = errors.length === 0;\n\nreturn [{\n  json: {\n    valid,\n    errors,\n    lead,\n    // Only pass ai forward when it's valid — downstream nodes\n    // can then treat it as trustworthy.\n    ai: valid ? ai : null,\n    model,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        -144
+      ],
+      "id": "208064b6-40a2-4c38-a59c-a747a8191bac",
+      "name": "Validate AI"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=http://api:8000/api/leads/{{ $json.lead.id }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{ \"status\": \"needs_review\" }",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1664,
+        16
+      ],
+      "id": "91ac67fd-737d-4d7e-9424-cc4cf6140593",
+      "name": "Mark Needs Review"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b38a8a32-1462-4ebd-a6d6-df4fd3f34e80",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1424,
+        -144
+      ],
+      "id": "0a16d355-0d91-4b15-a0de-fc563fca5b4e",
+      "name": "Is AI Valid?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": false, \"reason\": \"ai_validation_failed\", \"errors\": $('Validate AI').item.json.errors, \"lead\": $('Validate AI').item.json.lead, \"status\": \"needs_review\" } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1888,
+        16
+      ],
+      "id": "511fe0b3-377c-48de-8add-e4f52cb96e54",
+      "name": "Respond AI Failure"
     }
   ],
   "pinData": {},
@@ -230,7 +314,47 @@
       "main": [
         [
           {
+            "node": "Validate AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate AI": {
+      "main": [
+        [
+          {
+            "node": "Is AI Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is AI Valid?": {
+      "main": [
+        [
+          {
             "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Needs Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Needs Review": {
+      "main": [
+        [
+          {
+            "node": "Respond AI Failure",
             "type": "main",
             "index": 0
           }
@@ -243,7 +367,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "778a0aca-002f-497c-a747-116abada2938",
+  "versionId": "215fbe53-ee80-4999-a0d7-df9f40d9775d",
   "meta": {
     "instanceId": "3107a0aa081ca7877cdc4f88ad6354aa7783f632b8a258acda13436fb61c38fe"
   },
