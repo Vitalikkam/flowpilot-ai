@@ -129,7 +129,10 @@
         -144
       ],
       "id": "cce4264b-f081-4f50-97e4-e39fe8f30ec2",
-      "name": "Analyze Lead"
+      "name": "Analyze Lead",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 2000
     },
     {
       "parameters": {
@@ -175,7 +178,9 @@
         16
       ],
       "id": "91ac67fd-737d-4d7e-9424-cc4cf6140593",
-      "name": "Mark Needs Review"
+      "name": "Mark Needs Review",
+      "retryOnFail": true,
+      "maxTries": 2
     },
     {
       "parameters": {
@@ -268,7 +273,9 @@
         -160
       ],
       "id": "0ad028bc-35e9-43cf-997c-4aaa598fe6f0",
-      "name": "Evaluate Lead"
+      "name": "Evaluate Lead",
+      "retryOnFail": true,
+      "maxTries": 2
     },
     {
       "parameters": {
@@ -292,7 +299,9 @@
         -144
       ],
       "id": "77438c6e-c0a6-41a0-a9ae-eb7c321fec38",
-      "name": "Log Start"
+      "name": "Log Start",
+      "retryOnFail": true,
+      "maxTries": 2
     },
     {
       "parameters": {
@@ -330,7 +339,9 @@
         -160
       ],
       "id": "5b69cb60-138c-4dd8-b3d8-ad5f7bb79038",
-      "name": "Update Success"
+      "name": "Update Success",
+      "retryOnFail": true,
+      "maxTries": 2
     },
     {
       "parameters": {
@@ -355,7 +366,9 @@
         16
       ],
       "id": "6efefb29-1ce9-40ae-bcfc-3c5c07a94275",
-      "name": "Update Failed"
+      "name": "Update Failed",
+      "retryOnFail": true,
+      "maxTries": 2
     }
   ],
   "pinData": {},
@@ -529,12 +542,16 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "ACYF8DJq04Ba9KXo",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
-  "versionId": "b3959101-f802-46ef-9a32-b54b1392f53f",
+  "versionId": "0b18ab7a-bac3-426b-89f6-3df5c845b65a",
   "meta": {
     "instanceId": "3107a0aa081ca7877cdc4f88ad6354aa7783f632b8a258acda13436fb61c38fe"
   },
