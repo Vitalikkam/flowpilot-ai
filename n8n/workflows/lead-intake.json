@@ -93,11 +93,35 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        672,
-        -96
+        880,
+        -144
       ],
       "id": "10adf4c5-a0f0-44f5-835a-44940e0d4421",
       "name": "Respond OK"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://api:8000/api/leads",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.lead }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        -144
+      ],
+      "id": "de22f2cc-5383-4833-88dd-ff91c44c1a90",
+      "name": "Create Lead"
     }
   ],
   "pinData": {},
@@ -128,7 +152,7 @@
       "main": [
         [
           {
-            "node": "Respond OK",
+            "node": "Create Lead",
             "type": "main",
             "index": 0
           }
@@ -141,6 +165,17 @@
           }
         ]
       ]
+    },
+    "Create Lead": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -148,7 +183,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "1e33a909-c646-495b-a0e2-58807f680180",
+  "versionId": "603a9104-4a4c-42a5-982a-21443767805b",
   "meta": {
     "instanceId": "3107a0aa081ca7877cdc4f88ad6354aa7783f632b8a258acda13436fb61c38fe"
   },
