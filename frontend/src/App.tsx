@@ -1,6 +1,14 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link, Route, Routes } from "react-router-dom";
 
+import { api } from "@/services/api";
+
 function Home() {
+  const health = useQuery({
+    queryKey: ["health"],
+    queryFn: () => api.health(),
+  });
+
   return (
     <div className="p-8">
       <h1 className="text-3xl font-semibold text-text-primary">
@@ -9,6 +17,25 @@ function Home() {
       <p className="mt-2 text-text-secondary">
         Scaffold is running. Real dashboard comes next.
       </p>
+
+      <div className="mt-6 rounded-lg border border-bg-border bg-bg-surface p-4">
+        <h2 className="text-sm font-medium uppercase tracking-wide text-text-muted">
+          Backend health
+        </h2>
+        {health.isLoading && (
+          <p className="mt-2 text-text-secondary">Checking…</p>
+        )}
+        {health.isError && (
+          <p className="mt-2 text-status-danger">
+            Failed: {(health.error as Error).message}
+          </p>
+        )}
+        {health.data && (
+          <pre className="mt-2 font-mono text-sm text-status-success">
+            {JSON.stringify(health.data, null, 2)}
+          </pre>
+        )}
+      </div>
     </div>
   );
 }
