@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 
+from app.api import leads
 from app.core.database import engine
 
 app = FastAPI(title="FlowPilot AI API")
+
+app.include_router(leads.router)
 
 
 @app.get("/health")
