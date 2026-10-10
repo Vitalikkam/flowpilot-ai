@@ -1,0 +1,6 @@
+# Placeholder — services will be added in Chapter 2.
+version: "3.9"
+
+services: {}
+
+volumes: {}
