@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { LeadDrawer } from "@/components/LeadDrawer";
 import { LeadFilters } from "@/components/LeadFilters";
 import { LeadsTable } from "@/components/LeadsTable";
-import { useLead } from "@/hooks/useLead";
+import { useLeads } from "@/hooks/useLeads";
 import type { Lead, LeadPriority, LeadStatus } from "@/types/api";
 
 export function Leads() {
@@ -12,7 +12,7 @@ export function Leads() {
   const [priority, setPriority] = useState<LeadPriority | "">("");
   const [selected, setSelected] = useState<Lead | null>(null);
 
-  const query = useLead({
+  const query = useLeads({
     status: status || undefined,
     priority: priority || undefined,
     limit: 200,
