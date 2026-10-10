@@ -71,9 +71,14 @@ export function TopNav() {
         </button>
 
         {/* Avatar */}
-        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-accent-blue to-accent-violet text-[10px] font-semibold text-white">
-          VK
-        </div>
+        <div className="flex items-center gap-2 rounded-full border border-bg-border bg-bg-base py-0.5 pl-1 pr-3">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-accent-blue to-accent-violet text-[10px] font-semibold text-white">
+                VK
+            </div>
+            <span className="hidden text-xs font-medium text-text-secondary sm:inline">
+                Vitalii
+            </span>
+            </div>
       </div>
     </header>
   );

@@ -8,7 +8,11 @@ interface ExecutionFiltersProps {
   counts: Record<ExecutionStatus | "all", number>;
 }
 
-const tabs: Array<{ value: ExecutionStatus | ""; label: string; key: ExecutionStatus | "all" }> = [
+const tabs: Array<{
+  value: ExecutionStatus | "";
+  label: string;
+  key: ExecutionStatus | "all";
+}> = [
   { value: "", label: "All", key: "all" },
   { value: "success", label: "Success", key: "success" },
   { value: "failed", label: "Failed", key: "failed" },
@@ -21,7 +25,7 @@ export function ExecutionFilters({
   counts,
 }: ExecutionFiltersProps) {
   return (
-    <div className="flex flex-wrap gap-1 rounded-md border border-bg-border bg-bg-surface p-1">
+    <div className="flex flex-wrap gap-1">
       {tabs.map((tab) => {
         const active = value === tab.value;
         return (
@@ -29,10 +33,10 @@ export function ExecutionFilters({
             key={tab.key}
             onClick={() => onChange(tab.value)}
             className={clsx(
-              "flex items-center gap-2 rounded px-3 py-1.5 text-sm font-medium transition-colors",
+              "flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors",
               active
-                ? "bg-accent-blue/10 text-accent-blue"
-                : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary",
+                ? "border-accent-blue/40 bg-accent-blue/10 text-accent-blue"
+                : "border-bg-border bg-bg-surface text-text-secondary hover:border-accent-blue/30 hover:text-text-primary",
             )}
           >
             <span>{tab.label}</span>

@@ -34,7 +34,7 @@ export function WorkflowRuns() {
 
   return (
     <div className="p-6">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-5">
         <ExecutionFilters value={filter} onChange={setFilter} counts={counts} />
       </div>
 
