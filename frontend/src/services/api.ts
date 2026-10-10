@@ -42,8 +42,8 @@ async function request<T>(
   return body as T;
 }
 
-function toQuery(params: Record<string, unknown>): string {
-  const entries = Object.entries(params).filter(
+function toQuery(params: object): string {
+  const entries = Object.entries(params as Record<string, unknown>).filter(
     ([, value]) => value !== undefined && value !== null && value !== "",
   );
   if (entries.length === 0) return "";
@@ -88,7 +88,9 @@ export const api = {
   listExecutions(
     params: ExecutionListParams = {},
   ): Promise<WorkflowExecution[]> {
-    return request<WorkflowExecution[]>(`/api/executions${toQuery(params)}`);
+    return request<WorkflowExecution[]>(
+      `/api/executions${toQuery(params)}`,
+    );
   },
 
   getExecution(id: string): Promise<WorkflowExecution> {

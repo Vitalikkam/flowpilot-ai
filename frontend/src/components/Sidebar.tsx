@@ -2,16 +2,42 @@ import { NavLink } from "react-router-dom";
 import { LayoutDashboard, Users, Workflow, Zap } from "lucide-react";
 import clsx from "clsx";
 
+import { useHealth } from "@/hooks/useHealth";
+
 const navItems = [
   { to: "/", label: "Overview", icon: LayoutDashboard, end: true },
   { to: "/leads", label: "Leads", icon: Users, end: false },
   { to: "/workflow-runs", label: "Workflow Runs", icon: Workflow, end: false },
 ];
 
+function StatusIndicator() {
+  const health = useHealth();
+
+  let dotColor = "bg-text-muted";
+  let label = "Checking…";
+  let shadow = "";
+
+  if (health.isSuccess && health.data.status === "ok") {
+    dotColor = "bg-status-success";
+    label = "System online";
+    shadow = "shadow-[0_0_6px_rgba(16,185,129,0.7)]";
+  } else if (health.isError) {
+    dotColor = "bg-status-danger";
+    label = "System offline";
+    shadow = "shadow-[0_0_6px_rgba(239,68,68,0.7)]";
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`h-1.5 w-1.5 rounded-full ${dotColor} ${shadow}`} />
+      <span>{label}</span>
+    </div>
+  );
+}
+
 export function Sidebar() {
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-bg-border bg-bg-surface">
-      {/* Logo */}
       <div className="flex items-center gap-2 px-5 py-5">
         <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-accent-blue to-accent-violet shadow-glow">
           <Zap className="h-4 w-4 text-white" strokeWidth={2.5} />
@@ -21,7 +47,6 @@ export function Sidebar() {
         </span>
       </div>
 
-      {/* Navigation */}
       <nav className="mt-2 flex flex-col gap-1 px-3">
         {navItems.map(({ to, label, icon: Icon, end }) => (
           <NavLink
@@ -55,12 +80,8 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Footer */}
       <div className="mt-auto px-5 py-4 text-xs text-text-muted">
-        <div className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-status-success shadow-[0_0_6px_rgba(16,185,129,0.7)]" />
-          <span>System online</span>
-        </div>
+        <StatusIndicator />
       </div>
     </aside>
   );

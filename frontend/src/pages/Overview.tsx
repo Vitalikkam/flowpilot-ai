@@ -1,11 +1,13 @@
 import {
   Activity,
-  AlertTriangle,
   CheckCircle2,
   Flame,
   Users,
 } from "lucide-react";
 
+import { EmptyState } from "@/components/EmptyState";
+import { ErrorState } from "@/components/ErrorState";
+import { LoadingState } from "@/components/LoadingState";
 import { MetricCard } from "@/components/MetricCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useExecutions } from "@/hooks/useExecutions";
@@ -35,13 +37,11 @@ export function Overview() {
   return (
     <div className="p-6">
       {error && (
-        <div className="mb-6 flex items-center gap-2 rounded-md border border-status-danger/30 bg-status-danger/10 px-4 py-3 text-sm text-status-danger">
-          <AlertTriangle className="h-4 w-4" />
-          Failed to load dashboard data. Is the backend running?
+        <div className="mb-6">
+          <ErrorState message="Failed to load dashboard data. Is the backend running?" />
         </div>
       )}
 
-      {/* Metric cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           label="Total Leads"
@@ -64,13 +64,16 @@ export function Overview() {
         <MetricCard
           label="Success Rate"
           value={loading ? "—" : formatPercent(successRate)}
-          hint={finished.length ? `${successes}/${finished.length} runs` : "no runs yet"}
+          hint={
+            finished.length
+              ? `${successes}/${finished.length} runs`
+              : "no runs yet"
+          }
           icon={Activity}
           accent="cyan"
         />
       </div>
 
-      {/* Recent executions */}
       <div className="mt-8 rounded-lg border border-bg-border bg-bg-surface">
         <div className="flex items-center justify-between border-b border-bg-border px-5 py-4">
           <h2 className="text-sm font-medium uppercase tracking-wide text-text-muted">
@@ -79,13 +82,15 @@ export function Overview() {
         </div>
 
         {executions.isLoading && (
-          <div className="px-5 py-6 text-sm text-text-secondary">Loading…</div>
+          <LoadingState message="Loading executions…" />
         )}
 
         {!executions.isLoading && recentExecs.length === 0 && (
-          <div className="px-5 py-6 text-sm text-text-muted">
-            No executions yet. Send a lead to the webhook to see activity here.
-          </div>
+          <EmptyState
+            icon={Activity}
+            title="No executions yet"
+            description="Send a lead to the webhook to see activity here."
+          />
         )}
 
         {recentExecs.length > 0 && (
@@ -131,8 +136,11 @@ export function Overview() {
 }
 
 function ExecutionStatusBadge({ status }: { status: string }) {
-  if (status === "success") return <StatusBadge variant="success">success</StatusBadge>;
-  if (status === "failed") return <StatusBadge variant="danger">failed</StatusBadge>;
-  if (status === "running") return <StatusBadge variant="info">running</StatusBadge>;
+  if (status === "success")
+    return <StatusBadge variant="success">success</StatusBadge>;
+  if (status === "failed")
+    return <StatusBadge variant="danger">failed</StatusBadge>;
+  if (status === "running")
+    return <StatusBadge variant="info">running</StatusBadge>;
   return <StatusBadge variant="muted">{status}</StatusBadge>;
 }

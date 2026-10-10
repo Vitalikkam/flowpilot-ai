@@ -24,14 +24,6 @@ export function ExecutionsTable({
   executions,
   onSelect,
 }: ExecutionsTableProps) {
-  if (executions.length === 0) {
-    return (
-      <div className="px-5 py-10 text-center text-sm text-text-muted">
-        No executions match this filter.
-      </div>
-    );
-  }
-
   return (
     <table className="w-full">
       <thead>

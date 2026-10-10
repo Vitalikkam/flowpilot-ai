@@ -8,14 +8,6 @@ interface LeadsTableProps {
 }
 
 export function LeadsTable({ leads, onSelect }: LeadsTableProps) {
-  if (leads.length === 0) {
-    return (
-      <div className="px-5 py-10 text-center text-sm text-text-muted">
-        No leads match the current filters.
-      </div>
-    );
-  }
-
   return (
     <table className="w-full">
       <thead>

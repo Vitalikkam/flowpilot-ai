@@ -1,8 +1,12 @@
 import { useMemo, useState } from "react";
+import { Users } from "lucide-react";
 
+import { EmptyState } from "@/components/EmptyState";
+import { ErrorState } from "@/components/ErrorState";
 import { LeadDrawer } from "@/components/LeadDrawer";
 import { LeadFilters } from "@/components/LeadFilters";
 import { LeadsTable } from "@/components/LeadsTable";
+import { LoadingState } from "@/components/LoadingState";
 import { useLeads } from "@/hooks/useLeads";
 import type { Lead, LeadPriority, LeadStatus } from "@/types/api";
 
@@ -44,20 +48,24 @@ export function Leads() {
       </div>
 
       <div className="rounded-lg border border-bg-border bg-bg-surface">
-        {query.isLoading && (
-          <div className="px-5 py-10 text-center text-sm text-text-secondary">
-            Loading leads…
-          </div>
-        )}
+        {query.isLoading && <LoadingState message="Loading leads…" />}
 
         {query.isError && (
-          <div className="px-5 py-10 text-center text-sm text-status-danger">
-            Failed to load leads: {(query.error as Error).message}
+          <div className="p-5">
+            <ErrorState message={(query.error as Error).message} />
           </div>
         )}
 
-        {query.data && (
-          <LeadsTable leads={filtered} onSelect={(lead) => setSelected(lead)} />
+        {query.data && filtered.length === 0 && (
+          <EmptyState
+            icon={Users}
+            title="No leads match the current filters"
+            description="Try clearing the search or adjusting the filters."
+          />
+        )}
+
+        {query.data && filtered.length > 0 && (
+          <LeadsTable leads={filtered} onSelect={setSelected} />
         )}
       </div>
 
