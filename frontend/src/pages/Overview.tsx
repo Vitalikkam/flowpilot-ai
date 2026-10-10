@@ -1,14 +1,138 @@
+import {
+  Activity,
+  AlertTriangle,
+  CheckCircle2,
+  Flame,
+  Users,
+} from "lucide-react";
+
+import { MetricCard } from "@/components/MetricCard";
+import { StatusBadge } from "@/components/StatusBadge";
+import { useExecutions } from "@/hooks/useExecutions";
+import { useLeads } from "@/hooks/useLeads";
+import { formatDuration, formatPercent, formatRelative } from "@/utils/format";
+
 export function Overview() {
+  const leads = useLeads({ limit: 200 });
+  const executions = useExecutions({ limit: 50 });
+
+  const allLeads = leads.data ?? [];
+  const totalLeads = allLeads.length;
+  const qualified = allLeads.filter((l) => l.status === "qualified").length;
+  const highPriority = allLeads.filter((l) => l.priority === "high").length;
+
+  const allExecs = executions.data ?? [];
+  const finished = allExecs.filter(
+    (e) => e.status === "success" || e.status === "failed",
+  );
+  const successes = finished.filter((e) => e.status === "success").length;
+  const successRate = finished.length === 0 ? 0 : successes / finished.length;
+  const recentExecs = allExecs.slice(0, 5);
+
+  const loading = leads.isLoading || executions.isLoading;
+  const error = leads.isError || executions.isError;
+
   return (
     <div className="p-6">
-      <div className="rounded-lg border border-bg-border bg-bg-surface p-6">
-        <h2 className="text-base font-medium text-text-primary">
-          Overview
-        </h2>
-        <p className="mt-2 text-sm text-text-secondary">
-          Metrics and recent executions will appear here.
-        </p>
+      {error && (
+        <div className="mb-6 flex items-center gap-2 rounded-md border border-status-danger/30 bg-status-danger/10 px-4 py-3 text-sm text-status-danger">
+          <AlertTriangle className="h-4 w-4" />
+          Failed to load dashboard data. Is the backend running?
+        </div>
+      )}
+
+      {/* Metric cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard
+          label="Total Leads"
+          value={loading ? "—" : totalLeads}
+          icon={Users}
+          accent="blue"
+        />
+        <MetricCard
+          label="Qualified"
+          value={loading ? "—" : qualified}
+          icon={CheckCircle2}
+          accent="success"
+        />
+        <MetricCard
+          label="High Priority"
+          value={loading ? "—" : highPriority}
+          icon={Flame}
+          accent="violet"
+        />
+        <MetricCard
+          label="Success Rate"
+          value={loading ? "—" : formatPercent(successRate)}
+          hint={finished.length ? `${successes}/${finished.length} runs` : "no runs yet"}
+          icon={Activity}
+          accent="cyan"
+        />
+      </div>
+
+      {/* Recent executions */}
+      <div className="mt-8 rounded-lg border border-bg-border bg-bg-surface">
+        <div className="flex items-center justify-between border-b border-bg-border px-5 py-4">
+          <h2 className="text-sm font-medium uppercase tracking-wide text-text-muted">
+            Recent Executions
+          </h2>
+        </div>
+
+        {executions.isLoading && (
+          <div className="px-5 py-6 text-sm text-text-secondary">Loading…</div>
+        )}
+
+        {!executions.isLoading && recentExecs.length === 0 && (
+          <div className="px-5 py-6 text-sm text-text-muted">
+            No executions yet. Send a lead to the webhook to see activity here.
+          </div>
+        )}
+
+        {recentExecs.length > 0 && (
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-bg-border text-left text-xs uppercase tracking-wide text-text-muted">
+                <th className="px-5 py-3 font-medium">Workflow</th>
+                <th className="px-5 py-3 font-medium">Stage</th>
+                <th className="px-5 py-3 font-medium">Started</th>
+                <th className="px-5 py-3 font-medium">Duration</th>
+                <th className="px-5 py-3 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentExecs.map((exec) => (
+                <tr
+                  key={exec.id}
+                  className="border-b border-bg-border/50 text-sm last:border-0"
+                >
+                  <td className="px-5 py-3 text-text-primary">
+                    {exec.workflow_name}
+                  </td>
+                  <td className="px-5 py-3 text-text-secondary">
+                    {exec.stage ?? "—"}
+                  </td>
+                  <td className="px-5 py-3 text-text-secondary">
+                    {formatRelative(exec.started_at)}
+                  </td>
+                  <td className="px-5 py-3 font-mono text-xs text-text-secondary">
+                    {formatDuration(exec.started_at, exec.finished_at)}
+                  </td>
+                  <td className="px-5 py-3">
+                    <ExecutionStatusBadge status={exec.status} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
+}
+
+function ExecutionStatusBadge({ status }: { status: string }) {
+  if (status === "success") return <StatusBadge variant="success">success</StatusBadge>;
+  if (status === "failed") return <StatusBadge variant="danger">failed</StatusBadge>;
+  if (status === "running") return <StatusBadge variant="info">running</StatusBadge>;
+  return <StatusBadge variant="muted">{status}</StatusBadge>;
 }
