@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0A0F1F"/>
+      <stop offset="1" stop-color="#0F1729"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3B82F6"/>
+    </marker>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="960" height="520" fill="url(#bg)"/>
+
+  <text x="480" y="40" text-anchor="middle" fill="#F8FAFC" font-size="20" font-weight="600">
+    FlowPilot AI — Architecture
+  </text>
+
+  <!-- Client -->
+  <g>
+    <rect x="40" y="220" width="150" height="80" rx="8" fill="#141E33" stroke="#1F2A44"/>
+    <text x="115" y="255" text-anchor="middle" fill="#F8FAFC" font-size="14" font-weight="600">Browser</text>
+    <text x="115" y="275" text-anchor="middle" fill="#94A3B8" font-size="11">React dashboard</text>
+  </g>
+
+  <!-- Frontend -->
+  <g>
+    <rect x="240" y="220" width="150" height="80" rx="8" fill="#141E33" stroke="#3B82F6" stroke-width="1.5"/>
+    <text x="315" y="255" text-anchor="middle" fill="#F8FAFC" font-size="14" font-weight="600">Frontend</text>
+    <text x="315" y="275" text-anchor="middle" fill="#94A3B8" font-size="11">nginx + Vite build</text>
+  </g>
+
+  <!-- FastAPI -->
+  <g>
+    <rect x="440" y="220" width="150" height="80" rx="8" fill="#141E33" stroke="#8B5CF6" stroke-width="1.5" filter="url(#glow)"/>
+    <text x="515" y="255" text-anchor="middle" fill="#F8FAFC" font-size="14" font-weight="600">FastAPI</text>
+    <text x="515" y="275" text-anchor="middle" fill="#94A3B8" font-size="11">Business rules + API</text>
+  </g>
+
+  <!-- n8n -->
+  <g>
+    <rect x="640" y="100" width="150" height="80" rx="8" fill="#141E33" stroke="#06B6D4" stroke-width="1.5"/>
+    <text x="715" y="135" text-anchor="middle" fill="#F8FAFC" font-size="14" font-weight="600">n8n</text>
+    <text x="715" y="155" text-anchor="middle" fill="#94A3B8" font-size="11">Workflow orchestration</text>
+  </g>
+
+  <!-- Ollama -->
+  <g>
+    <rect x="640" y="220" width="150" height="80" rx="8" fill="#141E33" stroke="#10B981" stroke-width="1.5"/>
+    <text x="715" y="255" text-anchor="middle" fill="#F8FAFC" font-size="14" font-weight="600">Ollama</text>
+    <text x="715" y="275" text-anchor="middle" fill="#94A3B8" font-size="11">llama3.2 (local AI)</text>
+  </g>
+
+  <!-- PostgreSQL -->
+  <g>
+    <rect x="640" y="340" width="150" height="80" rx="8" fill="#141E33" stroke="#F59E0B" stroke-width="1.5"/>
+    <text x="715" y="375" text-anchor="middle" fill="#F8FAFC" font-size="14" font-weight="600">PostgreSQL</text>
+    <text x="715" y="395" text-anchor="middle" fill="#94A3B8" font-size="11">Leads · Analyses · Runs</text>
+  </g>
+
+  <!-- Arrows -->
+  <line x1="190" y1="260" x2="240" y2="260" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="390" y1="260" x2="440" y2="260" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="590" y1="245" x2="640" y2="150" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="590" y1="260" x2="640" y2="260" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="590" y1="275" x2="640" y2="360" stroke="#3B82F6" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Labels -->
+  <text x="480" y="470" text-anchor="middle" fill="#64748B" font-size="11" font-style="italic">
+    All services run locally via Docker Compose · Zero recurring cost
+  </text>
+</svg>
