@@ -1,0 +1,158 @@
+{
+  "name": "Lead Intake & AI Qualification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "leads/intake",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5a993d32-af5a-42e6-9d3e-4257929dd80e",
+      "name": "Webhook",
+      "webhookId": "3d4d9720-3207-424a-a8ac-76b45878cc9d"
+    },
+    {
+      "parameters": {
+        "jsCode": "// The Webhook node output wraps the request as { headers, params, query, body }.\nconst body = $input.first().json.body ?? {};\n\nconst errors = [];\n\n// ── name ────────────────────────────────────────────────\nif (typeof body.name !== 'string' || body.name.trim().length === 0) {\n  errors.push('name is required');\n} else if (body.name.length > 200) {\n  errors.push('name must be at most 200 characters');\n}\n\n// ── email ───────────────────────────────────────────────\nif (typeof body.email !== 'string' || body.email.trim().length === 0) {\n  errors.push('email is required');\n} else if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(body.email)) {\n  errors.push('email is not valid');\n}\n\n// ── message ─────────────────────────────────────────────\nif (typeof body.message !== 'string' || body.message.trim().length === 0) {\n  errors.push('message is required');\n} else if (body.message.length > 5000) {\n  errors.push('message must be at most 5000 characters');\n}\n\n// ── source ──────────────────────────────────────────────\nconst allowedSources = ['website', 'email', 'form', 'api', 'other'];\nconst source = typeof body.source === 'string' && body.source.length > 0\n  ? body.source\n  : 'website';\nif (!allowedSources.includes(source)) {\n  errors.push(`source must be one of: ${allowedSources.join(', ')}`);\n}\n\nreturn [{\n  json: {\n    valid: errors.length === 0,\n    errors,\n    lead: {\n      name: typeof body.name === 'string' ? body.name.trim() : '',\n      email: typeof body.email === 'string' ? body.email.trim().toLowerCase() : '',\n      company: typeof body.company === 'string' && body.company.trim().length > 0\n        ? body.company.trim()\n        : null,\n      message: typeof body.message === 'string' ? body.message.trim() : '',\n      source,\n    },\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "696db8c9-4487-4605-905c-3de54291ad41",
+      "name": "Validate Input"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8827dd1d-c352-4537-9f01-20976a785287",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "a337b7a9-c570-4faf-84dd-b993b62e55ed",
+      "name": "Is Valid?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": false, \"errors\": $json.errors } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        96
+      ],
+      "id": "b851f965-88fc-46ba-b54c-2bfb9cb75787",
+      "name": "Respond 400"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"lead\": $json.lead } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "10adf4c5-a0f0-44f5-835a-44940e0d4421",
+      "name": "Respond OK"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Is Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid?": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond 400",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1e33a909-c646-495b-a0e2-58807f680180",
+  "meta": {
+    "instanceId": "3107a0aa081ca7877cdc4f88ad6354aa7783f632b8a258acda13436fb61c38fe"
+  },
+  "nodeGroups": [],
+  "id": "UltUWGpiFbQG1vHh",
+  "tags": []
+}
