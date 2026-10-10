@@ -5,7 +5,11 @@ from .execution import (
     WorkflowExecutionUpdate,
     WorkflowExecutionResponse,
 )
-from .qualification import QualificationRequest, QualificationResult
+from .qualification import (
+    EvaluateLeadRequest,
+    EvaluateLeadResponse,
+    QualificationResult,
+)
 
 __all__ = [
     "LeadCreate",
@@ -16,6 +20,7 @@ __all__ = [
     "WorkflowExecutionCreate",
     "WorkflowExecutionUpdate",
     "WorkflowExecutionResponse",
-    "QualificationRequest",
+    "EvaluateLeadRequest",
+    "EvaluateLeadResponse",
     "QualificationResult",
 ]

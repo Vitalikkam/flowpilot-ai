@@ -54,3 +54,16 @@ def update_lead(db: Session, lead: Lead, payload: LeadUpdate) -> Lead:
     db.commit()
     db.refresh(lead)
     return lead
+
+def apply_classification(
+    db: Session,
+    lead: Lead,
+    status: str,
+    priority: str,
+) -> Lead:
+    """Persist the qualification outcome on the lead."""
+    lead.status = status
+    lead.priority = priority
+    db.commit()
+    db.refresh(lead)
+    return lead

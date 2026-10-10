@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas import LeadCreate, LeadResponse, LeadUpdate
-from app.services import lead_service
+from app.schemas import LeadCreate, LeadResponse, LeadUpdate, EvaluateLeadRequest, EvaluateLeadResponse
+from app.services import lead_service, analysis_service, qualification
 
 router = APIRouter(prefix="/api/leads", tags=["leads"])
 
@@ -43,3 +43,42 @@ def update_lead(lead_id: UUID, payload: LeadUpdate, db: Session = Depends(get_db
     if lead is None:
         raise HTTPException(status_code=404, detail="Lead not found")
     return lead_service.update_lead(db, lead, payload)
+
+@router.post("/{lead_id}/evaluate", response_model=EvaluateLeadResponse)
+def evaluate_lead(
+    lead_id: UUID,
+    payload: EvaluateLeadRequest,
+    db: Session = Depends(get_db),
+):
+    lead = lead_service.get_lead(db, lead_id)
+    if lead is None:
+        raise HTTPException(status_code=404, detail="Lead not found")
+
+    analysis = analysis_service.upsert_analysis(
+        db,
+        lead=lead,
+        summary=payload.summary,
+        category=payload.category,
+        budget_usd=payload.budget_usd,
+        urgency=payload.urgency,
+        model=payload.model,
+    )
+
+    result = qualification.qualify(
+        category=payload.category,
+        budget_usd=payload.budget_usd,
+        urgency=payload.urgency,
+        has_valid_contact=payload.has_valid_contact,
+    )
+
+    lead_service.apply_classification(
+        db, lead, status=result.status, priority=result.priority
+    )
+
+    return EvaluateLeadResponse(
+        lead_id=lead.id,
+        analysis_id=analysis.id,
+        priority=result.priority,
+        status=result.status,
+        reasons=result.reasons,
+    )
