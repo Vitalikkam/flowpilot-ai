@@ -112,7 +112,7 @@
         "url": "http://host.docker.internal:11434/api/chat",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"llama3.2\",\n  \"stream\": false,\n  \"format\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"summary\": {\"type\": \"string\"},\n      \"category\": {\n        \"type\": \"string\",\n        \"enum\": [\"web_development\", \"automation\", \"consulting\", \"other\"]\n      },\n      \"budget_usd\": {\"type\": [\"number\", \"null\"]},\n      \"urgency\": {\n        \"type\": \"string\",\n        \"enum\": [\"low\", \"medium\", \"high\"]\n      }\n    },\n    \"required\": [\"summary\", \"category\", \"budget_usd\", \"urgency\"]\n  },\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You analyze inbound business leads. Extract ONLY information supported by the message. Do not invent a budget or deadline. Rules for urgency: 'high' if the lead wants to start within 30 days or expresses time pressure; 'medium' if within 1-3 months; 'low' otherwise. Return data matching the provided JSON schema exactly.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify($json.message) }}\n    }\n  ]\n}",
+        "jsonBody": "={\n  \"model\": \"llama3.2\",\n  \"stream\": false,\n  \"format\": {\n    \"type\": \"object\",\n    \"properties\": {\n      \"summary\": {\"type\": \"string\"},\n      \"category\": {\n        \"type\": \"string\",\n        \"enum\": [\"web_development\", \"automation\", \"consulting\", \"other\"]\n      },\n      \"budget_usd\": {\"type\": [\"number\", \"null\"]},\n      \"urgency\": {\n        \"type\": \"string\",\n        \"enum\": [\"low\", \"medium\", \"high\"]\n      }\n    },\n    \"required\": [\"summary\", \"category\", \"budget_usd\", \"urgency\"]\n  },\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You analyze inbound business leads. Extract ONLY information supported by the message. Do not invent a budget or deadline. Rules for urgency: 'high' if the lead wants to start within 30 days or expresses time pressure; 'medium' if within 1-3 months; 'low' otherwise. Return data matching the provided JSON schema exactly.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify($json.lead.message) }}\n    }\n  ]\n}",
         "options": {
           "response": {
             "response": {
@@ -125,7 +125,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        896,
+        1296,
         -144
       ],
       "id": "cce4264b-f081-4f50-97e4-e39fe8f30ec2",
@@ -138,7 +138,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1072,
+        1456,
         -144
       ],
       "id": "9c5ba7e0-779d-4c08-b583-890cc47dd4a0",
@@ -151,7 +151,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1232,
+        1616,
         -144
       ],
       "id": "208064b6-40a2-4c38-a59c-a747a8191bac",
@@ -171,7 +171,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        1664,
+        2048,
         16
       ],
       "id": "91ac67fd-737d-4d7e-9424-cc4cf6140593",
@@ -205,7 +205,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1424,
+        1808,
         -144
       ],
       "id": "0a16d355-0d91-4b15-a0de-fc563fca5b4e",
@@ -222,8 +222,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1856,
-        80
+        2432,
+        16
       ],
       "id": "511fe0b3-377c-48de-8add-e4f52cb96e54",
       "name": "Respond AI Failure"
@@ -231,7 +231,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ { \"success\": true, \"lead\": $('Validate AI').item.json.lead, \"ai\": $('Validate AI').item.json.ai, \"model\": $('Validate AI').item.json.model, \"qualification\": { \"priority\": $json.priority, \"status\": $json.status, \"reasons\": $json.reasons, \"analysis_id\": $json.analysis_id } } }}",
+        "responseBody": "={{ { \"success\": true, \"lead\": $('Validate AI').item.json.lead, \"ai\": $('Validate AI').item.json.ai, \"model\": $('Validate AI').item.json.model, \"qualification\": { \"priority\": $('Evaluate Lead').item.json.priority, \"status\": $('Evaluate Lead').item.json.status, \"reasons\": $('Evaluate Lead').item.json.reasons, \"analysis_id\": $('Evaluate Lead').item.json.analysis_id }, \"execution_id\": $('Attach Execution').item.json.execution_id } }}",
         "options": {
           "responseCode": 200
         }
@@ -239,7 +239,7 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        1824,
+        2448,
         -160
       ],
       "id": "10adf4c5-a0f0-44f5-835a-44940e0d4421",
@@ -264,11 +264,98 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        1648,
+        2032,
         -160
       ],
       "id": "0ad028bc-35e9-43cf-997c-4aaa598fe6f0",
       "name": "Evaluate Lead"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://api:8000/api/executions",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"lead_id\": \"{{ $json.id }}\",\n  \"workflow_name\": \"Lead Intake & AI Qualification\",\n  \"stage\": \"created\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        896,
+        -144
+      ],
+      "id": "77438c6e-c0a6-41a0-a9ae-eb7c321fec38",
+      "name": "Log Start"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    execution_id: $input.first().json.id,\n    lead: $('Create Lead').item.json,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        -144
+      ],
+      "id": "0440c7c9-9b62-4876-9886-56aa3b9b373c",
+      "name": "Attach Execution"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=http://api:8000/api/executions/{{ $('Attach Execution').item.json.execution_id }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"status\": \"success\", \"stage\": \"completed\" }",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2256,
+        -160
+      ],
+      "id": "5b69cb60-138c-4dd8-b3d8-ad5f7bb79038",
+      "name": "Update Success"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=http://api:8000/api/executions/{{ $('Attach Execution').item.json.execution_id }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"status\": \"failed\",\n  \"stage\": \"ai_validation\",\n  \"error_message\": \"{{ $('Validate AI').item.json.errors.join('; ') }}\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2240,
+        16
+      ],
+      "id": "6efefb29-1ce9-40ae-bcfc-3c5c07a94275",
+      "name": "Update Failed"
     }
   ],
   "pinData": {},
@@ -317,7 +404,7 @@
       "main": [
         [
           {
-            "node": "Analyze Lead",
+            "node": "Log Start",
             "type": "main",
             "index": 0
           }
@@ -379,7 +466,7 @@
       "main": [
         [
           {
-            "node": "Respond AI Failure",
+            "node": "Update Failed",
             "type": "main",
             "index": 0
           }
@@ -390,7 +477,51 @@
       "main": [
         [
           {
+            "node": "Update Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Start": {
+      "main": [
+        [
+          {
+            "node": "Attach Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach Execution": {
+      "main": [
+        [
+          {
+            "node": "Analyze Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Success": {
+      "main": [
+        [
+          {
             "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Failed": {
+      "main": [
+        [
+          {
+            "node": "Respond AI Failure",
             "type": "main",
             "index": 0
           }
@@ -403,7 +534,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "340d6e10-0a5d-4059-8941-06bf49274ba2",
+  "versionId": "b3959101-f802-46ef-9a32-b54b1392f53f",
   "meta": {
     "instanceId": "3107a0aa081ca7877cdc4f88ad6354aa7783f632b8a258acda13436fb61c38fe"
   },
